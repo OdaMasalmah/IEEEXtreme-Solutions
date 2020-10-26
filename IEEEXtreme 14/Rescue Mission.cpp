@@ -43,6 +43,7 @@ int main(){
                 if(l1 > r2 || l2 > r1)continue;
                 vec[i].first.first = min(l1, l2);
                 vec[i].first.second = max(r1, r2);
+                vec[i].second += vec[j].second;
                 vec.erase(vec.begin() + j);
                 j = i;
                 deleted = 1;
