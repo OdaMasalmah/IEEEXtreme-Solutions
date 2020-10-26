@@ -16,23 +16,26 @@ typedef long long ll;
 #define S second
 
 vector<string> vec;
-map<char, int> val;
+int val[256];
 string r = "23456789XJQKA";
-void bt(string s, int sz){
+string rr = "";
+unordered_map<string, bool> cant;
+bool srt2(char &a, char &b){
+    return val[a] < val[b];
+}
+void bt(string s, int sz, int ind){
     if(s.size() == sz){
         vec.pb(s);
         return;
     }
-    for(int i = 0; i < r.size(); i++){
-        bt(s + r[i], sz);
+    for(int i = ind; i < rr.size(); i++){
+        bt(s + rr[i], sz, i);
     }
 }
 bool srt(pair<int, string> &a, pair<int, string> &b){
     if(a.first != b.first)
             return a.first > b.first;
-    bool ok = 1;
-    if(a.second.size() < b.second.size())ok = 1;
-    else ok = 0;
+    bool ok = 0;
     for(int i = 0; i < min(a.second.size(), b.second.size()); i++){
         if(val[a.second[i]] < val[b.second[i]]){
             ok = 1;
@@ -51,29 +54,38 @@ int main(){
     cin >> n >> k;
     string s, w; cin >> s >> w;
     vector<pair<int, string> > ans;
-    bt("", k);
+    int done[256];
+    mm(done);
+    for(int i = 0; i < r.size(); i++){
+        if(!done[r[i]])rr += r[i];
+    }
+    bt("", k, 0);
     for(int i = 0; i < r.size(); i++){
         val[r[i]] = i;
     }
     for(int i = 0; i < vec.size(); i++){
-        map<char, int> has;
+        sort(vec[i].begin(), vec[i].end(), srt2);
+        int has[256];
+        mm(has);
         int currscore = 0;
+        bool ok = 1;
         for(int a = 0; a < k; a++){
             has[vec[i][a]]++;
-            if(has[vec[i][a]] == 1)currscore++;
-            else if(has[vec[i][a]] == 2)currscore += 19;
-            else if (has[vec[i][a]] == 3)currscore += 1760 -20;
+            if(has[vec[i][a]] > 4)ok = 0;
+            if(has[vec[i][a]] == 2)currscore++;
+            else if(has[vec[i][a]] == 3)currscore += 19;
+            else if (has[vec[i][a]] == 4)currscore += 1740;
         }
-        bool ok = 1;
         for(int j = 0; j < n; j++){
             has[s[j]]++;
+            if(has[s[j]] > 4)ok = 0;
+            if((has[s[j]] == 1 && w[j] == 'y'))ok = 0;
             if(has[s[j]] == 2 || has[s[j]] == 3 || has[s[j]] == 4){
                 if(w[j] == 'n')ok = 0;
                 if(has[s[j]] == 2)currscore++;
-                if(has[s[j]] == 3)currscore += 20 - 1;
-                if(has[s[j]] == 4)currscore += 1760 - 20;
+                if(has[s[j]] == 3)currscore += 19;
+                if(has[s[j]] == 4)currscore += 1740;
             }
-            else if(w[j] == 'y')ok = 0;
         }
         if(ok)ans.pb({currscore, vec[i]});
     }
